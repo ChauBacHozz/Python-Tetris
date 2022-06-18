@@ -40,7 +40,6 @@ for i in range (0, CELLS_ON_ROW * CELLS_ON_COL):
 clock = pg.time.Clock()
 move_down = CELLS_ON_ROW
 
-
 #DRAW SCORE SECTION
 game_point = 0
 font = pg.font.Font("freesansbold.ttf", 36)
