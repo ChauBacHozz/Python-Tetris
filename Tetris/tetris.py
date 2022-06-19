@@ -17,13 +17,13 @@ pg.display.set_caption("Tetris")
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
-COLORS = [(255,0,0),
-(255,128,0),
-(0,255,0),
-(127, 0, 255),
-(0,0,255),
-(76,0,153),
-(0,204,102)]
+COLORS = [(0, 255, 255),
+(255, 255, 0),
+(128, 0, 128),
+(0, 255, 0),
+(255, 0, 0),
+(0, 0, 255),
+(255, 127, 0)]
 
 #GAME PROPERTIES
 CELL_SIZE = 30
@@ -40,7 +40,7 @@ mlsec = 0
 NEXTTET_WIDTH = CELL_SIZE * 3
 NEXTTET_HEIGHT = CELL_SIZE * 4
 NEXTTET_LEFT_GAP = 605
-NEXTTET_UPPER_GAP = 400
+NEXTTET_UPPER_GAP = 320
 
 # taken_cells = []
 game_map = []
@@ -51,12 +51,9 @@ move_down = CELLS_ON_ROW
 
 #DRAW SCORE SECTION
 game_point = 0
-font = pg.font.Font("freesansbold.ttf", 36)
-textX = 525
+font = pg.font.Font("VCR_OSD_MONO_1.001.ttf", 40)
+textX = 510
 textY = 100
-def showScore(point):
-    score = font.render("Score: " + "{:06d}".format(point), True, WHITE)
-    screen.blit(score, (textX,textY))
 
 #TETROMINO DEFINES
 oTetromino = [
@@ -134,6 +131,10 @@ def drawTakenTetrominos():
     for i in range (0, CELLS_ON_COL * CELLS_ON_ROW):
         if game_map[i] != 0:
             drawCell(i, game_map[i])
+
+def showScore(point):
+    score = font.render("SCORE:" + "{:06d}".format(point), True, WHITE)
+    screen.blit(score, (textX,textY))
 
 def drawNextTetSection():
     next = font.render("NEXT", True, WHITE)
