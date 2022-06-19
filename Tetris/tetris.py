@@ -7,7 +7,7 @@ pg.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 740
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-icon = pg.image.load("./Tetris/tetris.png")
+icon = pg.image.load("tetris.png")
 pg.display.set_icon(icon)
 pg.display.set_caption("Tetris")
 
@@ -125,6 +125,12 @@ def drawTakenTetrominos():
             drawCell(i, game_map[i])
 
 #CHECKING GAME EVENT
+def checkTetLeft(tet):
+    res = tet[0]
+    for i in tet:
+        if (i + CELLS_ON_ROW) % CELLS_ON_ROW < (res + CELLS_ON_ROW) % CELLS_ON_ROW:
+            res = i
+    return res
 def checkBottomCollision(pos):
     for i in tetromino[rotation]:
         if game_map[pos + i + CELLS_ON_ROW] != 0:
@@ -181,15 +187,26 @@ def checkFullAllRow(pos):
                 res = game_map[i]
                 game_map[i] = 0
                 game_map[i + ct_length * CELLS_ON_ROW] = res
+def checkRot(pos):
+    new_rotation = (rotation + 1) % 4
+    first_cell = checkTetLeft(tetromino[new_rotation]) 
+    corner = 1
+    ind = (first_cell + CELLS_ON_ROW) % CELLS_ON_ROW
+    if (first_cell + CELLS_ON_ROW) % CELLS_ON_ROW % CELLS_ON_ROW > 5:
+        corner = -1
+    count = 0
+    for i in range (0,4):
+        if i == ind:
+            continue
+        if abs((pos + tetromino[new_rotation][i]) % CELLS_ON_ROW - (pos + first_cell) % CELLS_ON_ROW) > 4:
+            count += corner
+    return count
 
 def checkLose(pos):
     for i in range (0, 12):
         if game_map[i] != 0:
             return True
     return False
-
-
-
 
 
 #GAME LOOP
@@ -210,16 +227,19 @@ while screen_looping:
                 if leftEdge(drop_pos):
                     drop_pos -= 1
                     move_down = 0
-                    pg.display.flip()
             if event.key == pg.K_RIGHT:
                 if rightEdge(drop_pos):
                     drop_pos += 1
                     move_down = 0
-                    pg.display.flip()
             if event.key == pg.K_SPACE:
                 if checkEdge(drop_pos) == False:
-                    rotation = (rotation + 1) % 4
-                    pg.display.flip()
+                    if checkRot(drop_pos) == 0:
+                        rotation = (rotation + 1) % 4
+                    else:
+                        drop_pos += checkRot(drop_pos)
+                        rotation = (rotation + 1) % 4
+
+
             if event.key == pg.K_UP:
                 game_pause = True
 
