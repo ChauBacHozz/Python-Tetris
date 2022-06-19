@@ -1,4 +1,6 @@
 from ast import Global
+from hashlib import new
+from pdb import post_mortem
 import pygame as pg
 import random
 pg.init()
@@ -33,6 +35,13 @@ LEFT_GAP = 70
 UPPER_GAP = 40
 drop_pos = 5
 mlsec = 0
+
+#NEXT TETROMINO SECTION
+NEXTTET_WIDTH = CELL_SIZE * 3
+NEXTTET_HEIGHT = CELL_SIZE * 4
+NEXTTET_LEFT_GAP = 605
+NEXTTET_UPPER_GAP = 400
+
 # taken_cells = []
 game_map = []
 for i in range (0, CELLS_ON_ROW * CELLS_ON_COL):
@@ -75,9 +84,9 @@ tTetromino = [
     [1, CELLS_ON_ROW, 1 + CELLS_ON_ROW, 1 + CELLS_ON_ROW*2]
 ]
 iTetromino = [
-    [0, CELLS_ON_ROW, CELLS_ON_ROW*2, CELLS_ON_ROW*3],
+    [1, CELLS_ON_ROW + 1, CELLS_ON_ROW*2 + 1, CELLS_ON_ROW*3 + 1],
     [CELLS_ON_ROW, 1 + CELLS_ON_ROW, 2 + CELLS_ON_ROW, 3 + CELLS_ON_ROW],
-    [0, CELLS_ON_ROW, CELLS_ON_ROW*2, CELLS_ON_ROW*3],
+    [1, CELLS_ON_ROW + 1, CELLS_ON_ROW*2 + 1, CELLS_ON_ROW*3 + 1],
     [CELLS_ON_ROW, 1 + CELLS_ON_ROW, 2 + CELLS_ON_ROW, 3 + CELLS_ON_ROW]
 ]
 lTetromino = [
@@ -87,7 +96,7 @@ lTetromino = [
     [CELLS_ON_ROW, 1 + CELLS_ON_ROW, 2 + CELLS_ON_ROW, CELLS_ON_ROW*2]
 ]
 rv_lTetromino = [
-    [0, 1, CELLS_ON_ROW, CELLS_ON_ROW*2],
+    [1, 2, CELLS_ON_ROW + 1, CELLS_ON_ROW*2 + 1],
     [CELLS_ON_ROW, 1 + CELLS_ON_ROW, 2 + CELLS_ON_ROW, 2 + CELLS_ON_ROW*2],
     [1, 1 + CELLS_ON_ROW, CELLS_ON_ROW*2, 1 + CELLS_ON_ROW*2],
     [0, CELLS_ON_ROW, 1 + CELLS_ON_ROW, 2 + CELLS_ON_ROW]
@@ -103,8 +112,10 @@ tetrominos = [
 ]
 rotation = 0
 rand_num = random.randint(0, 6)
+rand_num_next = random.randint(0, 6)
 tetromino = tetrominos[rand_num]
 color = COLORS[rand_num]
+color_next = COLORS[rand_num_next]
 #DRAW STUFFS ON SCREEN
 def drawTetrisSurface():
     pg.draw.line(screen, WHITE, (500, 0), (500, SCREEN_HEIGHT), 2)
@@ -124,6 +135,15 @@ def drawTakenTetrominos():
         if game_map[i] != 0:
             drawCell(i, game_map[i])
 
+def drawNextTetSection():
+    next = font.render("NEXT", True, WHITE)
+    screen.blit(next, (NEXTTET_LEFT_GAP , NEXTTET_UPPER_GAP - 70))
+    pg.draw.rect(screen, WHITE, (NEXTTET_LEFT_GAP - 10, NEXTTET_UPPER_GAP - 20, NEXTTET_WIDTH + 20, NEXTTET_HEIGHT + 40), 2)
+    for i in tetrominos[rand_num_next][0]:
+        pg.draw.rect(screen, color_next, 
+        (NEXTTET_LEFT_GAP + ((i + CELLS_ON_ROW) % CELLS_ON_ROW) * CELL_SIZE
+        ,NEXTTET_UPPER_GAP + (i // CELLS_ON_ROW) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
 #CHECKING GAME EVENT
 def checkTetLeft(tet):
     res = tet[0]
@@ -131,6 +151,13 @@ def checkTetLeft(tet):
         if (i + CELLS_ON_ROW) % CELLS_ON_ROW < (res + CELLS_ON_ROW) % CELLS_ON_ROW:
             res = i
     return res
+def checkTetRight(tet):
+    res = tet[0]
+    for i in tet:
+        if (i + CELLS_ON_ROW) % CELLS_ON_ROW > (res + CELLS_ON_ROW) % CELLS_ON_ROW:
+            res = i
+    return res
+
 def checkBottomCollision(pos):
     for i in tetromino[rotation]:
         if game_map[pos + i + CELLS_ON_ROW] != 0:
@@ -188,20 +215,34 @@ def checkFullAllRow(pos):
                 game_map[i] = 0
                 game_map[i + ct_length * CELLS_ON_ROW] = res
 def checkRot(pos):
-    new_rotation = (rotation + 1) % 4
-    first_cell = checkTetLeft(tetromino[new_rotation]) 
-    corner = 1
-    ind = (first_cell + CELLS_ON_ROW) % CELLS_ON_ROW
-    if (first_cell + CELLS_ON_ROW) % CELLS_ON_ROW % CELLS_ON_ROW > 5:
-        corner = -1
-    count = 0
-    for i in range (0,4):
-        if i == ind:
-            continue
-        if abs((pos + tetromino[new_rotation][i]) % CELLS_ON_ROW - (pos + first_cell) % CELLS_ON_ROW) > 4:
-            count += corner
-    return count
+    # new_rotation = (rotation + 1) % 4
+    # first_cell = checkTetLeft(tetromino[new_rotation])
+    # last_cell = checkTetRight(tetromino[new_rotation])
+    # count = 0
+    # res = 0
+    # for i in tetromino[new_rotation]:
+    #     # print(pos + i)
+    #     if (pos + i) % CELLS_ON_ROW == 0 or (pos + i) % CELLS_ON_ROW == 11:
+    #         print("check")
+    #         # if (pos + first_cell) % CELLS_ON_ROW > 5:
+    #         #     # pos -= 5
+    #         #     res = CELLS_ON_ROW - ((pos - 5 + last_cell) % CELLS_ON_ROW)
+    #         #     print(res)
+                
+    #         # else:
+    #         #     # pos += 5
+    #         #     res = ((pos + 5 + first_cell) % CELLS_ON_ROW) * (-1)
+    #         #     # print(res)
+    #         break
+    # return res
 
+    for i in tetromino[(rotation + 1) % 4]:
+        if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 0:
+            return False
+    for i in tetromino[(rotation + 1) % 4]:
+        if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 11:
+            return False
+        return True
 def checkLose(pos):
     for i in range (0, 12):
         if game_map[i] != 0:
@@ -233,16 +274,10 @@ while screen_looping:
                     move_down = 0
             if event.key == pg.K_SPACE:
                 if checkEdge(drop_pos) == False:
-                    if checkRot(drop_pos) == 0:
+                    if checkRot(drop_pos):
                         rotation = (rotation + 1) % 4
-                    else:
-                        drop_pos += checkRot(drop_pos)
-                        rotation = (rotation + 1) % 4
-
-
             if event.key == pg.K_UP:
-                game_pause = True
-
+                game_pause = abs(game_pause - 1)
         if event.type == pg.KEYUP:
             if event.key == pg.K_LEFT:
                 move_down = CELLS_ON_ROW
@@ -251,29 +286,32 @@ while screen_looping:
             if event.key == pg.K_DOWN:
                 fall_speed = 0.27
     screen.fill(BLACK)
-    if game_pause == False:
-        drawTetrisSurface()
-        drawTakenTetrominos()
-        drawTetromino(drop_pos, color)
+    drawTetrisSurface()
+    drawTakenTetrominos()
+    drawNextTetSection()
+    # if game_pause == False:
+    drawTetromino(drop_pos, color)
 
-        if checkLose(drop_pos):
-            game_pause = True
+    if checkLose(drop_pos):
+        game_pause = True
         
-        fall_time += clock.get_rawtime()
-        clock.tick()
-        if fall_time/1000 >= fall_speed:
-            fall_time = 0
-            if checkEdge(drop_pos) == False:
-                drop_pos += move_down
-            else: 
-                for i in tetromino[rotation]:
-                    game_map[drop_pos + i] = color
-                checkFullAllRow(drop_pos)
-                rand_num = random.randint(0, 6)
-                tetromino = tetrominos[rand_num]
-                color = COLORS[rand_num]
-                drop_pos = 5
-                rotation = 0
+    fall_time += clock.get_rawtime()
+    clock.tick()
+    if fall_time/1000 >= fall_speed:
+        fall_time = 0
+        if checkEdge(drop_pos) == False:
+            drop_pos += move_down
+        else: 
+            for i in tetromino[rotation]:
+                game_map[drop_pos + i] = color
+            checkFullAllRow(drop_pos)
+            rand_num = rand_num_next
+            tetromino = tetrominos[rand_num]
+            color = color_next
+            drop_pos = 5
+            rotation = 0
+            rand_num_next = random.randint(0, 6)
+            color_next = COLORS[rand_num_next]
     if game_pause == True:
         clock.tick(0)
     showScore(game_point)
