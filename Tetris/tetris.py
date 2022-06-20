@@ -1,6 +1,3 @@
-from ast import Global
-from hashlib import new
-from pdb import post_mortem
 import pygame as pg
 import random
 pg.init()
@@ -25,6 +22,40 @@ COLORS = [(0, 255, 255),
 (0, 0, 255),
 (255, 127, 0)]
 
+#BUTTON DEFINES
+class Button:
+    def __init__(self, text, width, height, pos, font, color):
+        # global font
+        self.top_rect = pg.Rect(pos, (width,height))
+        self.top_color = color
+        self.button_text = text
+        self.text_font = font
+        self.text_surf = self.text_font.render(self.button_text, True, WHITE)
+        self.text_rect = self.text_surf.get_rect(center = self.top_rect.center)
+    def draw(self):
+        pg.draw.rect(screen, self.top_color, self.top_rect)
+        screen.blit(self.text_surf, self.text_rect)  
+    # def click(self, event):
+    #     global game_pause
+    #     x, y = pg.mouse.get_pos()
+    #     if event.type == pg.MOUSEBUTTONDOWN:
+    #         if pg.mouse.get_pressed()[0]:
+    #             if self.top_rect.collidepoint(x, y):
+    #                 game_pause = True
+class TimeButton(Button):
+    def click(self, event):
+        global game_pause
+        x, y = pg.mouse.get_pos()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if pg.mouse.get_pressed()[0]:
+                if self.top_rect.collidepoint(x, y):
+                    game_pause = abs(game_pause - 1)
+                    if self.button_text == "PAUSE":
+                        self.button_text = "RESUME"
+                    else:
+                        self.button_text = "PAUSE"
+                    self.text_surf = self.text_font.render(self.button_text, True, WHITE)
+
 #GAME PROPERTIES
 CELL_SIZE = 30
 GRID_WIDTH = 360
@@ -35,12 +66,13 @@ LEFT_GAP = 70
 UPPER_GAP = 40
 drop_pos = 5
 mlsec = 0
+level = 1
 
 #NEXT TETROMINO SECTION
 NEXTTET_WIDTH = CELL_SIZE * 3
 NEXTTET_HEIGHT = CELL_SIZE * 4
-NEXTTET_LEFT_GAP = 605
-NEXTTET_UPPER_GAP = 320
+NEXTTET_LEFT_GAP = 530
+NEXTTET_UPPER_GAP = 220
 
 # taken_cells = []
 game_map = []
@@ -51,9 +83,11 @@ move_down = CELLS_ON_ROW
 
 #DRAW SCORE SECTION
 game_point = 0
-font = pg.font.Font("VCR_OSD_MONO_1.001.ttf", 40)
+gamefont = pg.font.Font("VCR_OSD_MONO_1.001.ttf", 40)
 textX = 510
-textY = 100
+textY = 70
+
+btn1 = TimeButton("PAUSE", 240, 50, (530, 550), gamefont, (255, 65, 0))   
 
 #TETROMINO DEFINES
 oTetromino = [
@@ -133,11 +167,11 @@ def drawTakenTetrominos():
             drawCell(i, game_map[i])
 
 def showScore(point):
-    score = font.render("SCORE:" + "{:06d}".format(point), True, WHITE)
+    score = gamefont.render("SCORE:" + "{:06d}".format(point), True, WHITE)
     screen.blit(score, (textX,textY))
 
 def drawNextTetSection():
-    next = font.render("NEXT", True, WHITE)
+    next = gamefont.render("NEXT", True, WHITE)
     screen.blit(next, (NEXTTET_LEFT_GAP , NEXTTET_UPPER_GAP - 70))
     pg.draw.rect(screen, WHITE, (NEXTTET_LEFT_GAP - 10, NEXTTET_UPPER_GAP - 20, NEXTTET_WIDTH + 20, NEXTTET_HEIGHT + 40), 2)
     for i in tetrominos[rand_num_next][0]:
@@ -145,7 +179,25 @@ def drawNextTetSection():
         (NEXTTET_LEFT_GAP + ((i + CELLS_ON_ROW) % CELLS_ON_ROW) * CELL_SIZE
         ,NEXTTET_UPPER_GAP + (i // CELLS_ON_ROW) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
+def drawGameLevel():
+    global level
+    pg.draw.rect(screen, WHITE, (640, 170, 100, 200), 2)
 #CHECKING GAME EVENT
+def checkLevel(point):
+    global level
+    global current_speed
+    if point == 10:
+        level += 1
+        current_speed = 0.2
+    if point == 40:
+        level += 1
+        current_speed = 0.17
+    if point == 60:
+        level += 1
+        current_speed = 0.1
+    if point == 100:
+        level += 1
+        current_speed = 0.05
 def checkTetLeft(tet):
     res = tet[0]
     for i in tet:
@@ -196,6 +248,7 @@ def checkFullOneRow(pos):
 
 def checkFullAllRow(pos):
     global game_point
+    global level
     first_row = (pos + tetromino[rotation][0]) // CELLS_ON_ROW
     second_row = (pos + tetromino[rotation][3]) // CELLS_ON_ROW
     col_take = []
@@ -254,7 +307,8 @@ def checkLose(pos):
 #GAME LOOP
 screen_looping = True
 game_pause = False
-fall_speed = 0.27
+current_speed = 0.27
+fall_speed = current_speed
 fall_time = 0
 while screen_looping:
     pg.display.flip()
@@ -262,6 +316,7 @@ while screen_looping:
     if pg.key.get_pressed()[pg.K_DOWN]:
         fall_speed = 0.05
     for event in pg.event.get():
+        btn1.click(event)
         if event.type == pg.QUIT:
             screen_looping = False 
         if event.type == pg.KEYDOWN:
@@ -285,14 +340,17 @@ while screen_looping:
             if event.key == pg.K_RIGHT:
                 move_down = CELLS_ON_ROW
             if event.key == pg.K_DOWN:
-                fall_speed = 0.27
+                fall_speed = current_speed
     screen.fill(BLACK)
     drawTetrisSurface()
     drawTakenTetrominos()
     drawNextTetSection()
+    checkLevel(game_point)
+    drawGameLevel()
     # if game_pause == False:
-    drawTetromino(drop_pos, color)
 
+    drawTetromino(drop_pos, color)
+    btn1.draw()
     if checkLose(drop_pos):
         game_pause = True
         
@@ -301,6 +359,7 @@ while screen_looping:
     if fall_time/1000 >= fall_speed:
         fall_time = 0
         if checkEdge(drop_pos) == False:
+
             drop_pos += move_down
         else: 
             for i in tetromino[rotation]:
