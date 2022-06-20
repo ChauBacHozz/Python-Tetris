@@ -6,7 +6,7 @@ pg.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 740
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-icon = pg.image.load("tetris.png")
+icon = pg.image.load("./asset/tetris.png")
 pg.display.set_icon(icon)
 pg.display.set_caption("Tetris")
 
@@ -22,40 +22,6 @@ COLORS = [(0, 255, 255),
 (0, 0, 255),
 (255, 127, 0)]
 
-#BUTTON DEFINES
-class Button:
-    def __init__(self, text, width, height, pos, font, color):
-        # global font
-        self.top_rect = pg.Rect(pos, (width,height))
-        self.top_color = color
-        self.button_text = text
-        self.text_font = font
-        self.text_surf = self.text_font.render(self.button_text, True, WHITE)
-        self.text_rect = self.text_surf.get_rect(center = self.top_rect.center)
-    def draw(self):
-        pg.draw.rect(screen, self.top_color, self.top_rect)
-        screen.blit(self.text_surf, self.text_rect)  
-    # def click(self, event):
-    #     global game_pause
-    #     x, y = pg.mouse.get_pos()
-    #     if event.type == pg.MOUSEBUTTONDOWN:
-    #         if pg.mouse.get_pressed()[0]:
-    #             if self.top_rect.collidepoint(x, y):
-    #                 game_pause = True
-class TimeButton(Button):
-    def click(self, event):
-        global game_pause
-        x, y = pg.mouse.get_pos()
-        if event.type == pg.MOUSEBUTTONDOWN:
-            if pg.mouse.get_pressed()[0]:
-                if self.top_rect.collidepoint(x, y):
-                    game_pause = abs(game_pause - 1)
-                    if self.button_text == "PAUSE":
-                        self.button_text = "RESUME"
-                    else:
-                        self.button_text = "PAUSE"
-                    self.text_surf = self.text_font.render(self.button_text, True, WHITE)
-
 #GAME PROPERTIES
 CELL_SIZE = 30
 GRID_WIDTH = 360
@@ -67,12 +33,47 @@ UPPER_GAP = 40
 drop_pos = 5
 mlsec = 0
 level = 1
+nextTetFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 40)
+levelFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 34)
+textX = 520
+textY = 70
 
 #NEXT TETROMINO SECTION
 NEXTTET_WIDTH = CELL_SIZE * 3
 NEXTTET_HEIGHT = CELL_SIZE * 4
 NEXTTET_LEFT_GAP = 530
-NEXTTET_UPPER_GAP = 220
+NEXTTET_UPPER_GAP = 300
+
+
+#BUTTON DEFINES
+playImg = pg.image.load("./asset/play-64.png")
+pauseImg = pg.image.load("./asset/pause-64.png")
+class TimeButton:
+    def __init__(self,  width, height, pos, img1, img2, color):
+        # global font
+        self.top_rect = pg.Rect(pos, (width,height))
+        self.top_color = color
+        self.play_img = img1
+        self.pause_img = img2
+        self.icon = img2
+        self.text_rect = self.play_img.get_rect(center = self.top_rect.center)
+    def draw(self):
+        pg.draw.rect(screen, self.top_color, self.top_rect, border_radius=4)
+        screen.blit(self.icon, self.text_rect)  
+    def click(self, event):
+        global game_pause
+        x, y = pg.mouse.get_pos()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if pg.mouse.get_pressed()[0]:
+                if self.top_rect.collidepoint(x, y):
+                    game_pause = abs(game_pause - 1)
+                    if game_pause == True:
+                        self.icon = self.play_img
+                        screen.blit(self.icon, self.text_rect)  
+                    else:
+                        self.icon = self.pause_img
+                        screen.blit(self.icon, self.text_rect)                        
+timeBtn = TimeButton(130, 150, (655, NEXTTET_UPPER_GAP - 70), playImg, pauseImg, (255, 65, 0))   
 
 # taken_cells = []
 game_map = []
@@ -83,11 +84,7 @@ move_down = CELLS_ON_ROW
 
 #DRAW SCORE SECTION
 game_point = 0
-gamefont = pg.font.Font("VCR_OSD_MONO_1.001.ttf", 40)
-textX = 510
-textY = 70
 
-btn1 = TimeButton("PAUSE", 240, 50, (530, 550), gamefont, (255, 65, 0))   
 
 #TETROMINO DEFINES
 oTetromino = [
@@ -148,6 +145,13 @@ tetromino = tetrominos[rand_num]
 color = COLORS[rand_num]
 color_next = COLORS[rand_num_next]
 #DRAW STUFFS ON SCREEN
+levelX = 660
+levelY = NEXTTET_UPPER_GAP + 105
+def drawLevel(lev):
+    global level
+    levelText = levelFont.render("LV:" + "{:03d}".format(lev), True, WHITE)
+    screen.blit(levelText, (levelX,levelY))
+
 def drawTetrisSurface():
     pg.draw.line(screen, WHITE, (500, 0), (500, SCREEN_HEIGHT), 2)
     pg.draw.rect(screen, WHITE, (LEFT_GAP, UPPER_GAP, GRID_WIDTH, GRID_HEIGHT))
@@ -167,11 +171,11 @@ def drawTakenTetrominos():
             drawCell(i, game_map[i])
 
 def showScore(point):
-    score = gamefont.render("SCORE:" + "{:06d}".format(point), True, WHITE)
+    score = nextTetFont.render("SCORE:" + "{:05d}".format(point), True, WHITE)
     screen.blit(score, (textX,textY))
 
 def drawNextTetSection():
-    next = gamefont.render("NEXT", True, WHITE)
+    next = nextTetFont.render("NEXT", True, WHITE)
     screen.blit(next, (NEXTTET_LEFT_GAP , NEXTTET_UPPER_GAP - 70))
     pg.draw.rect(screen, WHITE, (NEXTTET_LEFT_GAP - 10, NEXTTET_UPPER_GAP - 20, NEXTTET_WIDTH + 20, NEXTTET_HEIGHT + 40), 2)
     for i in tetrominos[rand_num_next][0]:
@@ -179,9 +183,6 @@ def drawNextTetSection():
         (NEXTTET_LEFT_GAP + ((i + CELLS_ON_ROW) % CELLS_ON_ROW) * CELL_SIZE
         ,NEXTTET_UPPER_GAP + (i // CELLS_ON_ROW) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
-def drawGameLevel():
-    global level
-    pg.draw.rect(screen, WHITE, (640, 170, 100, 200), 2)
 #CHECKING GAME EVENT
 def checkLevel(point):
     global level
@@ -316,7 +317,7 @@ while screen_looping:
     if pg.key.get_pressed()[pg.K_DOWN]:
         fall_speed = 0.05
     for event in pg.event.get():
-        btn1.click(event)
+        timeBtn.click(event)
         if event.type == pg.QUIT:
             screen_looping = False 
         if event.type == pg.KEYDOWN:
@@ -346,11 +347,9 @@ while screen_looping:
     drawTakenTetrominos()
     drawNextTetSection()
     checkLevel(game_point)
-    drawGameLevel()
-    # if game_pause == False:
 
     drawTetromino(drop_pos, color)
-    btn1.draw()
+    timeBtn.draw()
     if checkLose(drop_pos):
         game_pause = True
         
@@ -375,3 +374,4 @@ while screen_looping:
     if game_pause == True:
         clock.tick(0)
     showScore(game_point)
+    drawLevel(level)
