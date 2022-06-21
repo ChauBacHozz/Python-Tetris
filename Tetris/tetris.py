@@ -1,3 +1,4 @@
+import sre_compile
 import pygame as pg
 import random
 pg.init()
@@ -33,10 +34,10 @@ UPPER_GAP = 40
 drop_pos = 5
 mlsec = 0
 level = 1
-nextTetFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 40)
+nextTetFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 46)
 levelFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 34)
 textX = 520
-textY = 70
+textY = 40
 
 #NEXT TETROMINO SECTION
 NEXTTET_WIDTH = CELL_SIZE * 3
@@ -171,8 +172,11 @@ def drawTakenTetrominos():
             drawCell(i, game_map[i])
 
 def showScore(point):
-    score = nextTetFont.render("SCORE:" + "{:05d}".format(point), True, WHITE)
-    screen.blit(score, (textX,textY))
+    pg.draw.rect(screen, WHITE, (textX, textY, 260, 160), 4)
+    scoreText = nextTetFont.render("SCORE----", True, WHITE)
+    screen.blit(scoreText, (textX + 18,textY + 16))
+    scoreValue = nextTetFont.render("----" + "{:05d}".format(point), True, WHITE)
+    screen.blit(scoreValue, (textX,textY + 100))
 
 def drawNextTetSection():
     next = nextTetFont.render("NEXT", True, WHITE)
@@ -187,18 +191,22 @@ def drawNextTetSection():
 def checkLevel(point):
     global level
     global current_speed
-    if point == 10:
-        level += 1
-        current_speed = 0.2
-    if point == 40:
-        level += 1
-        current_speed = 0.17
-    if point == 60:
-        level += 1
-        current_speed = 0.1
-    if point == 100:
-        level += 1
+    if point > 100:
+        level = 5
         current_speed = 0.05
+        return 
+    if point >= 80:
+        level = 4
+        current_speed = 0.1
+        return
+    if point >= 40:
+        level = 3
+        current_speed = 0.17
+        return
+    if point >= 20:
+        level = 2
+        current_speed = 0.2
+        return
 def checkTetLeft(tet):
     res = tet[0]
     for i in tet:
@@ -263,6 +271,7 @@ def checkFullAllRow(pos):
     if ct_length != 0:
         #GOT POINTS AFTER FULL ROW
         game_point = game_point + 10 * ct_length 
+        checkLevel(game_point)
         head_pos = col_take[0]
         for i in reversed(range(0, head_pos)):
             if game_map[i] != 0:
@@ -346,7 +355,6 @@ while screen_looping:
     drawTetrisSurface()
     drawTakenTetrominos()
     drawNextTetSection()
-    checkLevel(game_point)
 
     drawTetromino(drop_pos, color)
     timeBtn.draw()
