@@ -1,4 +1,3 @@
-import sre_compile
 import pygame as pg
 import random
 pg.init()
@@ -108,11 +107,12 @@ class ResetButton:
         pg.draw.rect(screen, self.top_color, self.top_rect, border_radius=4)
         screen.blit(self.text, self.text_rect)  
     def click(self, event):
-        global game_map, drop_pos
+        global game_map, drop_pos, game_pause
         x, y = pg.mouse.get_pos()
         if event.type == pg.MOUSEBUTTONDOWN:
             if pg.mouse.get_pressed()[0]:
                 if self.top_rect.collidepoint(x, y):
+                    game_pause = False
                     for i in range(0, CELLS_ON_ROW * CELLS_ON_COL):
                         game_map[i] = 0
                         drop_pos = 5
@@ -192,7 +192,7 @@ levelX = 660
 levelY = NEXTTET_UPPER_GAP + 105
 def drawLevel(lev):
     global level
-    levelText = levelFont.render("LV:" + "{:03d}".format(lev), True, WHITE)
+    levelText = levelFont.render("LV:" + "{:03d}".format(lev), True, (248,255,13))
     screen.blit(levelText, (levelX,levelY))
     pg.draw.rect(screen, WHITE, (520, 460, 260, 80), 2)
     screen.blit(evaImg, (522, 462))
@@ -201,7 +201,8 @@ def drawLevel(lev):
 
 def drawTetrisSurface():
     pg.draw.line(screen, WHITE, (500, 0), (500, SCREEN_HEIGHT), 2)
-    pg.draw.rect(screen, WHITE, (LEFT_GAP, UPPER_GAP, GRID_WIDTH, GRID_HEIGHT))
+    pg.draw.rect(screen, (249, 44, 228), (LEFT_GAP-4, UPPER_GAP-4, GRID_WIDTH + 8, GRID_HEIGHT + 8), 4)
+    pg.draw.rect(screen, (40,33,33), (LEFT_GAP, UPPER_GAP, GRID_WIDTH, GRID_HEIGHT))
 
 def drawCell(pos, color):
     pg.draw.rect(screen, color, 
@@ -218,20 +219,22 @@ def drawTakenTetrominos():
             drawCell(i, game_map[i])
 
 def showScore(point):
-    pg.draw.rect(screen, WHITE, (textX, textY, 260, 160), 4)
-    scoreText = nextTetFont.render("SCORE----", True, WHITE)
+    pg.draw.rect(screen, (0,255,0), (textX, textY, 260, 160), 4)
+    scoreText = nextTetFont.render("SCORE----", True, (0,255,0))
     screen.blit(scoreText, (textX + 18,textY + 16))
-    scoreValue = nextTetFont.render("----" + "{:05d}".format(point), True, WHITE)
+    scoreValue = nextTetFont.render("----" + "{:05d}".format(point), True, (0,255,0))
     screen.blit(scoreValue, (textX,textY + 100))
 
 def drawNextTetSection():
-    next = nextTetFont.render("NEXT", True, WHITE)
-    screen.blit(next, (NEXTTET_LEFT_GAP , NEXTTET_UPPER_GAP - 70))
-    pg.draw.rect(screen, WHITE, (NEXTTET_LEFT_GAP - 10, NEXTTET_UPPER_GAP - 20, NEXTTET_WIDTH + 20, NEXTTET_HEIGHT + 40), 2)
+    next = nextTetFont.render("NEXT", True, (71,244,255))
+    screen.blit(next, (NEXTTET_LEFT_GAP - 5, NEXTTET_UPPER_GAP - 70))
+    pg.draw.rect(screen, (71,244,255), (NEXTTET_LEFT_GAP - 10, NEXTTET_UPPER_GAP - 20, NEXTTET_WIDTH + 20, NEXTTET_HEIGHT + 40), 2)
     for i in tetrominos[rand_num_next][0]:
         pg.draw.rect(screen, color_next, 
         (NEXTTET_LEFT_GAP + ((i + CELLS_ON_ROW) % CELLS_ON_ROW) * CELL_SIZE
         ,NEXTTET_UPPER_GAP + (i // CELLS_ON_ROW) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+# def drawGameLose():
 
 #CHECKING GAME EVENT
 def checkLevel(point):
