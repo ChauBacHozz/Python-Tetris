@@ -38,7 +38,11 @@ nextTetFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 46)
 levelFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 34)
 textX = 520
 textY = 40
-
+evaImg = pg.image.load("./asset/9cx960hvinf11.jpg")
+evaImg = pg.transform.scale(evaImg, (256, 76))
+resetImg = pg.image.load("./asset/sinchronize-64.png")
+exitImg = pg.image.load("./asset/exit-64.png")
+exitImg = pg.transform.scale(exitImg, (54, 54))
 #NEXT TETROMINO SECTION
 NEXTTET_WIDTH = CELL_SIZE * 3
 NEXTTET_HEIGHT = CELL_SIZE * 4
@@ -75,7 +79,45 @@ class TimeButton:
                         self.icon = self.pause_img
                         screen.blit(self.icon, self.text_rect)                        
 timeBtn = TimeButton(130, 150, (655, NEXTTET_UPPER_GAP - 70), playImg, pauseImg, (255, 65, 0))   
-
+class ExitButton:
+    def __init__(self, text, width, height, pos, color, font):
+        # global font
+        self.top_rect = pg.Rect(pos, (width,height))
+        self.top_color = color
+        self.text = font.render(text, True, WHITE)
+        self.text_rect = self.text.get_rect(center = self.top_rect.center)
+    def draw(self):
+        pg.draw.rect(screen, self.top_color, self.top_rect, border_radius=4)
+        screen.blit(self.text, self.text_rect)  
+    def click(self, event):
+        global screen_looping
+        x, y = pg.mouse.get_pos()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if pg.mouse.get_pressed()[0]:
+                if self.top_rect.collidepoint(x, y):
+                    screen_looping = False                
+exitBtn = ExitButton("EXIT", 180, 60, (600, 560), (255,0,0), levelFont)
+class ResetButton:
+    def __init__(self, text, width, height, pos, color, font):
+        # global font
+        self.top_rect = pg.Rect(pos, (width,height))
+        self.top_color = color
+        self.text = font.render(text, True, WHITE)
+        self.text_rect = self.text.get_rect(center = self.top_rect.center)
+    def draw(self):
+        pg.draw.rect(screen, self.top_color, self.top_rect, border_radius=4)
+        screen.blit(self.text, self.text_rect)  
+    def click(self, event):
+        global game_map, drop_pos
+        x, y = pg.mouse.get_pos()
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if pg.mouse.get_pressed()[0]:
+                if self.top_rect.collidepoint(x, y):
+                    for i in range(0, CELLS_ON_ROW * CELLS_ON_COL):
+                        game_map[i] = 0
+                        drop_pos = 5
+                    
+resetBtn = ResetButton("RESET", 180, 60, (520, 640), (255,0,0), levelFont)                       
 # taken_cells = []
 game_map = []
 for i in range (0, CELLS_ON_ROW * CELLS_ON_COL):
@@ -152,6 +194,10 @@ def drawLevel(lev):
     global level
     levelText = levelFont.render("LV:" + "{:03d}".format(lev), True, WHITE)
     screen.blit(levelText, (levelX,levelY))
+    pg.draw.rect(screen, WHITE, (520, 460, 260, 80), 2)
+    screen.blit(evaImg, (522, 462))
+    screen.blit(resetImg, (720, 640))
+    screen.blit(exitImg, (520, 560))
 
 def drawTetrisSurface():
     pg.draw.line(screen, WHITE, (500, 0), (500, SCREEN_HEIGHT), 2)
@@ -327,6 +373,8 @@ while screen_looping:
         fall_speed = 0.05
     for event in pg.event.get():
         timeBtn.click(event)
+        exitBtn.click(event)
+        resetBtn.click(event)
         if event.type == pg.QUIT:
             screen_looping = False 
         if event.type == pg.KEYDOWN:
@@ -358,6 +406,8 @@ while screen_looping:
 
     drawTetromino(drop_pos, color)
     timeBtn.draw()
+    exitBtn.draw()
+    resetBtn.draw()
     if checkLose(drop_pos):
         game_pause = True
         
