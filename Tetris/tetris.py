@@ -335,7 +335,8 @@ def checkRot(pos):
     if (pos + checkTetLeft(tetromino[rotation]) + CELLS_ON_ROW) % CELLS_ON_ROW < 5:
         for i in tetromino[new_rotation]:
             if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 11:
-                return (pos // CELLS_ON_ROW) * CELLS_ON_ROW  + ((first_cell + pos) % CELLS_ON_ROW - (pos) % CELLS_ON_ROW)
+                return ((pos // CELLS_ON_ROW) * CELLS_ON_ROW  + 
+                ((first_cell + pos) % CELLS_ON_ROW - (pos) % CELLS_ON_ROW))
     else:
         for i in tetromino[new_rotation]:
             if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 0:
