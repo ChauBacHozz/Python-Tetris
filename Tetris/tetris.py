@@ -328,34 +328,20 @@ def checkFullAllRow(pos):
                 game_map[i] = 0
                 game_map[i + ct_length * CELLS_ON_ROW] = res
 def checkRot(pos):
-    # new_rotation = (rotation + 1) % 4
-    # first_cell = checkTetLeft(tetromino[new_rotation])
-    # last_cell = checkTetRight(tetromino[new_rotation])
-    # count = 0
-    # res = 0
-    # for i in tetromino[new_rotation]:
-    #     # print(pos + i)
-    #     if (pos + i) % CELLS_ON_ROW == 0 or (pos + i) % CELLS_ON_ROW == 11:
-    #         print("check")
-    #         # if (pos + first_cell) % CELLS_ON_ROW > 5:
-    #         #     # pos -= 5
-    #         #     res = CELLS_ON_ROW - ((pos - 5 + last_cell) % CELLS_ON_ROW)
-    #         #     print(res)
-                
-    #         # else:
-    #         #     # pos += 5
-    #         #     res = ((pos + 5 + first_cell) % CELLS_ON_ROW) * (-1)
-    #         #     # print(res)
-    #         break
-    # return res
+    new_rotation = (rotation + 1) % 4
+    first_cell = checkTetLeft(tetromino[new_rotation])
+    last_cell = checkTetRight(tetromino[new_rotation])
+    length = (last_cell + CELLS_ON_ROW) % CELLS_ON_ROW - (first_cell + CELLS_ON_ROW) % CELLS_ON_ROW
+    if (pos + checkTetLeft(tetromino[rotation]) + CELLS_ON_ROW) % CELLS_ON_ROW < 5:
+        for i in tetromino[new_rotation]:
+            if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 11:
+                return (pos // CELLS_ON_ROW) * CELLS_ON_ROW  + ((first_cell + pos) % CELLS_ON_ROW - (pos) % CELLS_ON_ROW)
+    else:
+        for i in tetromino[new_rotation]:
+            if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 0:
+                return (pos // CELLS_ON_ROW) * CELLS_ON_ROW + 11 - length
+    return pos
 
-    for i in tetromino[(rotation + 1) % 4]:
-        if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 0:
-            return False
-    for i in tetromino[(rotation + 1) % 4]:
-        if (pos + i + CELLS_ON_ROW) % CELLS_ON_ROW == 11:
-            return False
-        return True
 def checkLose(pos):
     for i in range (0, 12):
         if game_map[i] != 0:
@@ -391,8 +377,10 @@ while screen_looping:
                     move_down = 0
             if event.key == pg.K_SPACE:
                 if checkEdge(drop_pos) == False:
-                    if checkRot(drop_pos):
-                        rotation = (rotation + 1) % 4
+                    # if checkRot(drop_pos):
+                    checkRot(drop_pos)
+                    drop_pos = checkRot(drop_pos)
+                    rotation = (rotation + 1) % 4
             if event.key == pg.K_UP:
                 game_pause = abs(game_pause - 1)
         if event.type == pg.KEYUP:
