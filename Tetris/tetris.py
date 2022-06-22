@@ -107,7 +107,7 @@ class ResetButton:
         pg.draw.rect(screen, self.top_color, self.top_rect, border_radius=4)
         screen.blit(self.text, self.text_rect)  
     def click(self, event):
-        global game_map, drop_pos, game_pause
+        global game_map, drop_pos, game_pause, game_point
         x, y = pg.mouse.get_pos()
         if event.type == pg.MOUSEBUTTONDOWN:
             if pg.mouse.get_pressed()[0]:
@@ -116,7 +116,7 @@ class ResetButton:
                     for i in range(0, CELLS_ON_ROW * CELLS_ON_COL):
                         game_map[i] = 0
                         drop_pos = 5
-                    
+                        game_point = 0
 resetBtn = ResetButton("RESET", 180, 60, (520, 640), (255,0,0), levelFont)                       
 # taken_cells = []
 game_map = []
@@ -360,7 +360,8 @@ while screen_looping:
     pg.display.flip()
     #check game events from keyboard and outter stuffs
     if pg.key.get_pressed()[pg.K_DOWN]:
-        fall_speed = 0.05
+            if game_pause == False:
+                fall_speed = 0.05
     for event in pg.event.get():
         timeBtn.click(event)
         exitBtn.click(event)
@@ -368,22 +369,19 @@ while screen_looping:
         if event.type == pg.QUIT:
             screen_looping = False 
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_LEFT:
-                if leftEdge(drop_pos):
-                    drop_pos -= 1
-                    move_down = 0
-            if event.key == pg.K_RIGHT:
-                if rightEdge(drop_pos):
-                    drop_pos += 1
-                    move_down = 0
-            if event.key == pg.K_SPACE:
-                if checkEdge(drop_pos) == False:
-                    # if checkRot(drop_pos):
-                    checkRot(drop_pos)
-                    drop_pos = checkRot(drop_pos)
-                    rotation = (rotation + 1) % 4
-            if event.key == pg.K_UP:
-                game_pause = abs(game_pause - 1)
+            if game_pause == False:
+                if event.key == pg.K_LEFT:
+                    if leftEdge(drop_pos):
+                        drop_pos -= 1
+                        move_down = 0
+                if event.key == pg.K_RIGHT:
+                    if rightEdge(drop_pos):
+                        drop_pos += 1
+                        move_down = 0
+                if event.key == pg.K_SPACE:
+                    if checkEdge(drop_pos) == False:
+                        drop_pos = checkRot(drop_pos)
+                        rotation = (rotation + 1) % 4
         if event.type == pg.KEYUP:
             if event.key == pg.K_LEFT:
                 move_down = CELLS_ON_ROW
