@@ -5,20 +5,12 @@ import Draw
 import Button
 import random
 
-
-#BUTTON DEFINES
 playImg = GameProps.pg.image.load("./asset/play-64.png")
 pauseImg = GameProps.pg.image.load("./asset/pause-64.png")
                    
 timeBtn = Button.TimeButton(130, 150, (655, GameProps.NEXTTET_UPPER_GAP - 70), playImg, pauseImg, (255, 65, 0))          
 exitBtn = Button.ExitButton("EXIT", 180, 60, (600, 560), (255,0,0), GameProps.levelFont)
 resetBtn = Button.ResetButton("RESET", 180, 60, (520, 640), (255,0,0), GameProps.levelFont)                       
-
-#DRAW SCORE SECTION
-
-#TETROMINO DEFINES
-#DRAW STUFFS ON GameProps.screen
-#GAME LOOP
 move_down = GameProps.CELLS_ON_ROW
 current_speed = 0.27
 fall_speed = current_speed
