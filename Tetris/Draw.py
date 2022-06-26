@@ -44,5 +44,8 @@ def drawNextTetSection():
         (GameProps.NEXTTET_LEFT_GAP + ((i + GameProps.CELLS_ON_ROW) % GameProps.CELLS_ON_ROW) * GameProps.CELL_SIZE
         ,GameProps.NEXTTET_UPPER_GAP + (i // GameProps.CELLS_ON_ROW) * GameProps.CELL_SIZE, GameProps.CELL_SIZE, GameProps.CELL_SIZE))
 
+def showStartMenu():
+    headingText = GameProps.startHeadingFont.render("TETRIS", True, (255,255,255))
+    GameProps.screen.blit(headingText, (GameProps.SCREEN_WIDTH/2 - headingText.get_rect().width/2, 80))
 
 

@@ -69,3 +69,11 @@ color_next = COLORS[rand_num_next]
 
 levelX = 660
 levelY = NEXTTET_UPPER_GAP + 105
+
+game_states = ["start_menu", "game_play", "end"]
+state = game_states[0]
+
+startHeadingFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 120)
+startMenuFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 80)
+scoreLoseFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 78)
+buttonLoseFont = pg.font.Font("./asset/times new roman bold.ttf", 60)
