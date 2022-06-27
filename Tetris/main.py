@@ -14,10 +14,9 @@ timeBtn = Button.TimeButton(130, 150, (655, GameProps.NEXTTET_UPPER_GAP - 70), p
 exitBtn = Button.ExitButton("EXIT", 180, 60, (600, 560), (255,0,0), GameProps.levelFont)
 resetBtn = Button.ResetButton("RESET", 180, 60, (520, 640), (255,0,0), GameProps.levelFont)
 startBtn = Button.StartButton("START", 200, 100, (GameProps.SCREEN_WIDTH/2 - 100, 280), (0,0,0), GameProps.startMenuFont)                       
-scoreBtn = Button.ScoreButton("SCORES", 200, 100, (GameProps.SCREEN_WIDTH/2 - 100, 380), (0,0,0), GameProps.startMenuFont)
-menuExitBtn = Button.ExitButton("EXIT", 200, 100, (GameProps.SCREEN_WIDTH/2 - 100, 480), (0,0,0), GameProps.startMenuFont)
+menuExitBtn = Button.ExitButton("EXIT", 200, 100, (GameProps.SCREEN_WIDTH/2 - 100, 380), (0,0,0), GameProps.startMenuFont)
 loseResetBtn = Button.StartButton("Start a new game", 250, 60, (120, 570), (0,0,0), GameProps.buttonLoseFont)
-loseExitBtn = Button.ExitButton("Exit (and be a pussy)", 800, 60, (100, 650), (0,0,0), GameProps.buttonLoseFont)
+loseExitBtn = Button.ExitButton("Exit, give up (and be a pussy)", 800, 60, (-10, 650), (0,0,0), GameProps.buttonLoseFont)
 
 move_down = GameProps.CELLS_ON_ROW
 current_speed = 0.27
@@ -36,7 +35,6 @@ while GameProps.screen_looping:
                 GameProps.screen_looping = False 
         Draw.showStartMenu()
         startBtn.draw()
-        scoreBtn.draw()
         menuExitBtn.draw()
     if GameProps.state == "game_play":
         if GameProps.pg.key.get_pressed()[GameProps.pg.K_DOWN]:
@@ -111,6 +109,6 @@ while GameProps.screen_looping:
                 GameProps.screen_looping = False 
         GameProps.screen.blit(loseBgImg, (-20,-50))
         loseScore = GameProps.scoreLoseFont.render(str(GameProps.game_point), True, (255,255,255))
-        GameProps.screen.blit(loseScore, (340, 480))
+        GameProps.screen.blit(loseScore, (340, 477))
         loseResetBtn.draw()
         loseExitBtn.draw()

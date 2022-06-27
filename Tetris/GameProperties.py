@@ -75,5 +75,5 @@ state = game_states[0]
 
 startHeadingFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 120)
 startMenuFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 80)
-scoreLoseFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 78)
+scoreLoseFont = pg.font.Font("./asset/times new roman bold.ttf", 72)
 buttonLoseFont = pg.font.Font("./asset/times new roman bold.ttf", 60)

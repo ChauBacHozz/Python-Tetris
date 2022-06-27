@@ -80,6 +80,11 @@ class StartButton:
             if GameProperties.pg.mouse.get_pressed()[0]:
                 if self.top_rect.collidepoint(x, y):
                     GameProperties.state = GameProperties.game_states[1]
+                    GameProperties.game_pause = False
+                    for i in range(0, GameProperties.CELLS_ON_ROW * GameProperties.CELLS_ON_COL):
+                        GameProperties.game_map[i] = 0
+                        GameProperties.drop_pos = 5
+                        GameProperties.game_point = 0
 
 class ScoreButton:
     def __init__(self, text, width, height, pos, color, font):
