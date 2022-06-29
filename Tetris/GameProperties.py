@@ -34,8 +34,6 @@ UPPER_GAP = 40
 drop_pos = 5
 mlsec = 0
 level = 1
-nextTetFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 46)
-levelFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 34)
 textX = 520
 textY = 40
 evaImg = pg.image.load("./asset/lenin.jpg")
@@ -49,16 +47,17 @@ NEXTTET_HEIGHT = CELL_SIZE * 4
 NEXTTET_LEFT_GAP = 530
 NEXTTET_UPPER_GAP = 300
 
-
+#Tạo game map
 game_map = []
 for i in range (0, CELLS_ON_ROW * CELLS_ON_COL):
     game_map.append(0)
 clock = pg.time.Clock()
-move_down = CELLS_ON_ROW
 
+move_down = CELLS_ON_ROW
 screen_looping = True
 game_pause = False
 game_point = 0
+
 
 rotation = 0
 rand_num = random.randint(0, 6)
@@ -70,10 +69,19 @@ color_next = COLORS[rand_num_next]
 levelX = 660
 levelY = NEXTTET_UPPER_GAP + 105
 
+#Đặt trạng thái cho màn hình game
 game_states = ["start_menu", "game_play", "end"]
 state = game_states[0]
 
+#Lấy font cho pygame
+nextTetFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 46)
+levelFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 34)
 startHeadingFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 120)
 startMenuFont = pg.font.Font("./asset/VCR_OSD_MONO_1.001.ttf", 80)
 scoreLoseFont = pg.font.Font("./asset/times new roman bold.ttf", 72)
 buttonLoseFont = pg.font.Font("./asset/times new roman bold.ttf", 60)
+
+move_down = CELLS_ON_ROW
+current_speed = 0.27
+fall_speed = current_speed
+fall_time = 0

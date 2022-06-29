@@ -1,7 +1,6 @@
 import GameProperties as GameProps
 import TetrominosCollection
 def drawLevel(lev):
-    global level
     levelText = GameProps.levelFont.render("LV:" + "{:03d}".format(lev), True, (248,255,13))
     GameProps.screen.blit(levelText, (GameProps.levelX,GameProps.levelY))
     GameProps.pg.draw.rect(GameProps.screen, GameProps.WHITE, (520, 460, 260, 80), 2)
@@ -13,16 +12,16 @@ def drawTetrisSurface():
     GameProps.pg.draw.line(GameProps.screen, GameProps.WHITE, (500, 0), (500, GameProps.SCREEN_HEIGHT), 2)
     GameProps.pg.draw.rect(GameProps.screen, (249, 44, 228), (GameProps.LEFT_GAP-4, GameProps.UPPER_GAP-4, GameProps.GRID_WIDTH + 8, GameProps.GRID_HEIGHT + 8), 4)
     GameProps.pg.draw.rect(GameProps.screen, (40,33,33), (GameProps.LEFT_GAP, GameProps.UPPER_GAP, GameProps.GRID_WIDTH, GameProps.GRID_HEIGHT))
-
+#Vẽ một ô vuông với kích thước dài rộng = CELL_SIZE
 def drawCell(pos, color):
     GameProps.pg.draw.rect(GameProps.screen, color, 
     (GameProps.LEFT_GAP + ((pos + GameProps.CELLS_ON_ROW) % GameProps.CELLS_ON_ROW) * GameProps.CELL_SIZE
     ,GameProps.UPPER_GAP + (pos // GameProps.CELLS_ON_ROW) * GameProps.CELL_SIZE, GameProps.CELL_SIZE, GameProps.CELL_SIZE))
-
+#Vẽ tetromino
 def drawTetromino(pos, color):
     for i in GameProps.tetromino[GameProps.rotation]:
         drawCell(pos + i, color)
-
+#Vẽ những màu đã lưu vào vị trí tương ứng trong game_map
 def drawTakenTetrominos():
     for i in range (0, GameProps.CELLS_ON_COL * GameProps.CELLS_ON_ROW):
         if GameProps.game_map[i] != 0:

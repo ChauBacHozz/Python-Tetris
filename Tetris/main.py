@@ -18,15 +18,11 @@ menuExitBtn = Button.ExitButton("EXIT", 200, 100, (GameProps.SCREEN_WIDTH/2 - 10
 loseResetBtn = Button.StartButton("Start a new game", 250, 60, (120, 570), (0,0,0), GameProps.buttonLoseFont)
 loseExitBtn = Button.ExitButton("Exit, give up (and be a pussy)", 800, 60, (-10, 650), (0,0,0), GameProps.buttonLoseFont)
 
-move_down = GameProps.CELLS_ON_ROW
-current_speed = 0.27
-fall_speed = current_speed
-fall_time = 0
+
 
 while GameProps.screen_looping:
     GameProps.pg.display.flip()
     GameProps.screen.fill(GameProps.BLACK)
-
     if GameProps.state == "start_menu":
         for event in GameProps.pg.event.get():
             startBtn.click(event)
@@ -39,7 +35,7 @@ while GameProps.screen_looping:
     if GameProps.state == "game_play":
         if GameProps.pg.key.get_pressed()[GameProps.pg.K_DOWN]:
                 if GameProps.game_pause == False:
-                    fall_speed = 0.05
+                    GameProps.fall_speed = 0.05
         for event in GameProps.pg.event.get():
             timeBtn.click(event)
             exitBtn.click(event)
@@ -51,26 +47,25 @@ while GameProps.screen_looping:
                     if event.key == GameProps.pg.K_LEFT:
                         if CheckEvent.leftEdge(GameProps.drop_pos):
                             GameProps.drop_pos -= 1
-                            move_down = 0
+                            GameProps.move_down = 0
                     if event.key == GameProps.pg.K_RIGHT:
                         if CheckEvent.rightEdge(GameProps.drop_pos):
                             GameProps.drop_pos += 1
-                            move_down = 0
+                            GameProps.move_down = 0
                     if event.key == GameProps.pg.K_SPACE:
                         if CheckEvent.checkEdge(GameProps.drop_pos) == False:
                             GameProps.drop_pos = CheckEvent.checkRot(GameProps.drop_pos)
                             GameProps.rotation = (GameProps.rotation + 1) % 4
             if event.type == GameProps.pg.KEYUP:
                 if event.key == GameProps.pg.K_LEFT:
-                    move_down = GameProps.CELLS_ON_ROW
+                    GameProps.move_down = GameProps.CELLS_ON_ROW
                 if event.key == GameProps.pg.K_RIGHT:
-                    move_down = GameProps.CELLS_ON_ROW
+                    GameProps.move_down = GameProps.CELLS_ON_ROW
                 if event.key == GameProps.pg.K_DOWN:
-                    fall_speed = current_speed
+                    GameProps.fall_speed = GameProps.current_speed
         Draw.drawTetrisSurface()
         Draw.drawTakenTetrominos()
         Draw.drawNextTetSection()
-
         Draw.drawTetromino(GameProps.drop_pos, GameProps.color)
         timeBtn.draw()
         exitBtn.draw()
@@ -78,18 +73,19 @@ while GameProps.screen_looping:
         if CheckEvent.checkLose(GameProps.drop_pos):
             GameProps.game_pause = True
             GameProps.state = GameProps.game_states[2]
-            
-        fall_time += GameProps.clock.get_rawtime()
+        #Đếm thời gian, sau một thời gian đủ thì thực hiện rơi tetromino
+        GameProps.fall_time += GameProps.clock.get_rawtime()
         GameProps.clock.tick()
-        if fall_time/1000 >= fall_speed:
-            fall_time = 0
+        if GameProps.fall_time/1000 >= GameProps.fall_speed:
+            GameProps.fall_time = 0
             if CheckEvent.checkEdge(GameProps.drop_pos) == False:
-
-                GameProps.drop_pos += move_down
+                GameProps.drop_pos += GameProps.move_down
             else: 
+                #Lưu giá trị màu sắc của tetromino vào vị trí tương ứng trong game_map
                 for i in GameProps.tetromino[GameProps.rotation]:
                     GameProps.game_map[GameProps.drop_pos + i] = GameProps.color
                 CheckEvent.checkFullAllRow(GameProps.drop_pos)
+                #Tạo ra tetromino mới, reset lại vị trí ban đầu, tạo màu mới 
                 GameProps.rand_num = GameProps.rand_num_next
                 GameProps.tetromino = TetrominosCollection.tetrominos[GameProps.rand_num]
                 GameProps.color = GameProps.color_next
@@ -98,9 +94,11 @@ while GameProps.screen_looping:
                 GameProps.rand_num_next = random.randint(0, 6)
                 GameProps.color_next = GameProps.COLORS[GameProps.rand_num_next]
         if GameProps.game_pause == True:
+            #Dừng thời gian 
             GameProps.clock.tick(0)
         Draw.showScore(GameProps.game_point)
         Draw.drawLevel(GameProps.level)
+        print(GameProps.level)
     if GameProps.state == "end":
         for event in GameProps.pg.event.get():
             loseExitBtn.click(event)
