@@ -81,10 +81,13 @@ class StartButton:
         if event.type == GameProperties.pg.MOUSEBUTTONDOWN:
             if GameProperties.pg.mouse.get_pressed()[0]:
                 if self.top_rect.collidepoint(x, y):
-                    GameProperties.state = GameProperties.game_states[1]
-                    GameProperties.game_pause = False
-                    GameProperties.drop_pos = 5
                     for i in range(0, GameProperties.CELLS_ON_ROW * GameProperties.CELLS_ON_COL):
                         GameProperties.game_map[i] = 0
-                        
+                    GameProperties.game_point = 0   
+                    GameProperties.current_speed = 0.27
+                    GameProperties.level = 1
+                    GameProperties.drop_pos = 5
+                    GameProperties.state = GameProperties.game_states[1]
+                    GameProperties.game_pause = False
+
 

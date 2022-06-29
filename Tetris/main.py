@@ -15,7 +15,7 @@ exitBtn = Button.ExitButton("EXIT", 180, 60, (600, 560), (255,0,0), GameProps.le
 resetBtn = Button.ResetButton("RESET", 180, 60, (520, 640), (255,0,0), GameProps.levelFont)
 startBtn = Button.StartButton("START", 200, 100, (GameProps.SCREEN_WIDTH/2 - 100, 280), (0,0,0), GameProps.startMenuFont)                       
 menuExitBtn = Button.ExitButton("EXIT", 200, 100, (GameProps.SCREEN_WIDTH/2 - 100, 380), (0,0,0), GameProps.startMenuFont)
-loseResetBtn = Button.StartButton("Start a new game", 250, 60, (120, 570), (0,0,0), GameProps.buttonLoseFont)
+loseResetBtn = Button.StartButton("Start a new game", 500, 60, (0, 570), (0,0,0), GameProps.buttonLoseFont)
 loseExitBtn = Button.ExitButton("Exit, give up (and be a pussy)", 800, 60, (-10, 650), (0,0,0), GameProps.buttonLoseFont)
 
 
@@ -98,7 +98,6 @@ while GameProps.screen_looping:
             GameProps.clock.tick(0)
         Draw.showScore(GameProps.game_point)
         Draw.drawLevel(GameProps.level)
-        print(GameProps.level)
     if GameProps.state == "end":
         for event in GameProps.pg.event.get():
             loseExitBtn.click(event)
